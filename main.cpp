@@ -7,17 +7,10 @@
 #include<iostream>
 #include "turing.h"
 
-const int MAXALPHABET = 255;
+const int MAXALPHABET = 128;
 const int MAXSTATES = 255;
 
 int TuringObject::gTuringObjectNum=0;
-
-
-char alphabet[MAXALPHABET];
-int maxalphabet;
-int maxstates;
-std::string currStr;
-std::string currRibbon;
 
 
 struct Rules {
@@ -27,12 +20,63 @@ struct Rules {
 	int isRule;
 };
 
-
-
-Rules currRules[MAXALPHABET][MAXSTATES];
-
-void GetRules()
+class tMachine
 {
+public:
+	void SetAlphabet(char *str);
+	void SetRibbon(char *str);
+	void SetRules();
+	void Solve();
+	tMachine() {maxalphabet=0;maxstates=0;};
+	~tMachine() {
+	for (int count = 0; count < (maxalphabet+1); count++)
+        delete [] currRules[count];
+	};
+private:
+	int maxalphabet;
+	int maxstates;
+	char alphabet[MAXALPHABET];
+	Rules **currRules;//[MAXALPHABET][MAXSTATES];
+	Ribbon tmRibbon; //ќбъ€вл€ем переменную, тип которой есть список
+
+};
+
+void tMachine::SetAlphabet(char *str)
+{
+	int i;
+	std::string currStr;
+	currStr = str;
+
+ maxalphabet = currStr.length();
+ 
+
+
+ for ( i = 0; i < maxalphabet; i++ )
+ {
+	 alphabet[i] = currStr.at(i);
+ }
+}
+
+void tMachine::SetRibbon(char *str)
+{
+	int i;
+	std::string currRibbon;
+	currRibbon = str;
+	int ribbonlength = currRibbon.length();
+	for ( i = 0; i < ribbonlength; i++ )
+		tmRibbon.Add(currRibbon.at(i)); //ƒобавл€ем в список элементы
+	tmRibbon.Show(); //ќтображаем список на экране
+
+}
+void tMachine::SetRules()
+{
+	int i;
+	maxstates = 9;
+
+	currRules = new Rules*[(maxalphabet+1)];
+	for (i=0; i<(maxalphabet+1); i++)
+		currRules[i] = new Rules[(maxstates+1)];
+
 currRules[0][0].nextstate = 0;
  currRules[0][0].currSymbol = '1';
  currRules[0][0].currDirection = TuringDirection::Right;
@@ -155,17 +199,9 @@ currRules[0][0].nextstate = 0;
 
 }
 
-void Solve()
+void tMachine::Solve()
 {
-int i;
-Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
-
- int ribbonlength = currRibbon.length();
-
- for ( i = 0; i < ribbonlength; i++ )
-	 lst.Add(currRibbon.at(i)); //ƒобавл€ем в список элементы
-  lst.Show(); //ќтображаем список на экране
-
+	int i;
 
   bool done = false;
   RibbonCell *temp;
@@ -174,9 +210,9 @@ Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
 
   int currentTuringMachineState=0;
 
-  lst.Top();
+  tmRibbon.Top();
   do {
-	  temp = lst.ReadCellFromHeadPosition();
+	  temp = tmRibbon.ReadCellFromHeadPosition();
 	  tempChar = temp->GetCharCellValue();
 	  currAlphabetNum = -1;
 	  for ( i = 0; i < maxalphabet; i++ )	  
@@ -190,12 +226,12 @@ Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
 			  if (currRules[currAlphabetNum][currentTuringMachineState].isRule)
 			  {
 				  temp->SetCellValue( currRules[currAlphabetNum][currentTuringMachineState].currSymbol);				  
-				  if (!lst.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
+				  if (!tmRibbon.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
 				  {
 					  if (currRules[currAlphabetNum][currentTuringMachineState].currDirection == TuringDirection::Right)
 					  {
-						  lst.Add(' ');
-						  if (!lst.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
+						  tmRibbon.Add(' ');
+						  if (!tmRibbon.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
 						  {
 							std::cout  << " Errorr !!!!";
 						  }
@@ -214,7 +250,7 @@ Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
 			  if (currRules[i][currentTuringMachineState].isRule)
 			  {
 				  temp->SetCellValue( currRules[i][currentTuringMachineState].currSymbol);				  
-				  lst.Move(currRules[i][currentTuringMachineState].currDirection);
+				  tmRibbon.Move(currRules[i][currentTuringMachineState].currDirection);
 				  currentTuringMachineState = currRules[i][currentTuringMachineState].nextstate;
 				  if ( currentTuringMachineState == maxstates)
 					  done = true;
@@ -224,7 +260,7 @@ Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
 
   } while (!done);
 
-  lst.Show(); //ќтображаем список на экране
+  tmRibbon.Show(); //ќтображаем список на экране
 
 }
 
@@ -233,6 +269,7 @@ Ribbon lst; //ќбъ€вл€ем переменную, тип которой есть список
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int i;
+	tMachine t1;
 	//TuringState *CurrentState;
  system("CLS");
 
@@ -240,29 +277,22 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::cout << "Put in alphabet"; 
  //std::getline(std::cin, currStr);
  //
- currStr = "1x=a*";
 
- maxalphabet = currStr.length();
- maxstates = 9;
-
-
- for ( i = 0; i < maxalphabet; i++ )
- {
-	 alphabet[i] = currStr.at(i);
- }
+ t1.SetAlphabet("1x=a*");
+ 
 
  //// Set rules
  
-GetRules(); 
+ t1.SetRules(); 
  ////
 
  // если хотим ввести ленту вручную
  //std::cout << "Put in current problem: "; 
  //std::getline(std::cin, currRibbon);
  //
- currRibbon = "*1111x11=*";
-
- Solve();
+ //currRibbon = "*1111x11=*";
+ t1.SetRibbon("*1111x11=*");
+ t1.Solve();
  
  system("PAUSE");
 
