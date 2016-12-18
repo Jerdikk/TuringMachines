@@ -6,6 +6,8 @@
 #include<string>
 #include<iostream>
 #include "turing.h"
+#include "tinyxml.h"
+
 
 const int MAXALPHABET = 128;
 const int MAXSTATES = 255;
@@ -24,6 +26,7 @@ class tMachine
 {
 public:
 	void SetAlphabet(char *str);
+	void SetAlphabetFromXML(char *str);
 	void SetRibbon(char *str);
 	void SetRules();
 	void Solve();
@@ -41,8 +44,63 @@ private:
 
 };
 
+void tMachine::SetAlphabetFromXML(char *str)
+{
+	//TiXmlDocument doc( "turing1.xml" );
+	TiXmlDocument doc( str );
+	bool loadOkay = doc.LoadFile();
+	if ( !loadOkay )
+	{
+		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		exit( 1 );
+	}
+
+	TiXmlNode* node = 0;
+	TiXmlNode* node1 = 0;
+	TiXmlElement* TuringMachineElement = 0;
+	TiXmlElement* itemElement = 0;
+
+	node = doc.FirstChild( "TuringMachine" );
+	assert( node );
+	TuringMachineElement = node->ToElement();
+	assert( TuringMachineElement  );
+	node = TuringMachineElement->FirstChildElement("Alphabet");	// This skips the "PDA" comment.
+	std::string ttt = node->ValueTStr().c_str();
+	assert( node );
+	itemElement = node->FirstChildElement();
+	ttt = itemElement->Value();
+	assert( itemElement  );
+	int count=0;
+	int i;
+	for( node1 = node->FirstChild( "Symbol" ),i=0;
+			 node1;
+			 node1 = node1->NextSibling( "Symbol" ),i++ )
+		{
+			ttt = node1->Value();
+			ttt= node1->FirstChild()->Value();
+			alphabet[i] = ttt.at(0);
+			count++;
+		}
+	//char * ttt=itemElement->Attribute();
+
+
+	//int i;
+	//std::string currStr;
+	//currStr = str;
+
+ maxalphabet = count;
+ 
+
+
+ //for ( i = 0; i < maxalphabet; i++ )
+// {
+//	 alphabet[i] = currStr.at(i);
+// }
+}
+
 void tMachine::SetAlphabet(char *str)
 {
+
 	int i;
 	std::string currStr;
 	currStr = str;
@@ -278,7 +336,7 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::getline(std::cin, currStr);
  //
 
- t1.SetAlphabet("1x=a*");
+ t1.SetAlphabetFromXML("turing1.xml");
  
 
  //// Set rules
@@ -291,7 +349,7 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::getline(std::cin, currRibbon);
  //
  //currRibbon = "*1111x11=*";
- t1.SetRibbon("*1111x11=*");
+ t1.SetRibbon("*1111x111=*");
  t1.Solve();
  
  system("PAUSE");

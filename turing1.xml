@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TuringMachine>
+  <Alphabet>  
+    <Symbol>1</Symbol>
+    <Symbol>x</Symbol>
+    <Symbol>=</Symbol>
+    <Symbol>a</Symbol>
+    <Symbol>*</Symbol>
+  </Alphabet>  
+  <Rules>
+    <Rule>
+      <CurentSymbol>1</CurentSymbol>
+      <CurrentState>0</CurrentState>
+      <SymbolToWrite>1</SymbolToWrite>
+      <NextState>0</NextState>
+      <Direction>R</Direction>
+      <IsRule>1</IsRule>
+    </Rule>
+  </Rules>
+</TuringMachine>
