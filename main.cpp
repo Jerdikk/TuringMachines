@@ -98,6 +98,32 @@ void tMachine::SetAlphabetFromXML(char *str)
 // }
 }
 
+
+void SaveXML()
+{
+	TiXmlDocument doc;
+	TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+	doc.LinkEndChild( decl );
+	TiXmlElement * element = new TiXmlElement( "TuringMachine" );
+	TiXmlElement * element1 = new TiXmlElement( "Alphabet" );
+	TiXmlElement * element2 = new TiXmlElement( "Symbol" );
+	TiXmlText * text = new TiXmlText( "1" );
+	element2->LinkEndChild( text );
+	element1->LinkEndChild( element2 );
+	element->LinkEndChild( element1 );
+
+	doc.LinkEndChild( element );
+// Make xml: <?xml ..><Hello>World</Hello>
+	/*TiXmlDocument doc;
+	TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+	TiXmlElement * element = new TiXmlElement( "Hello" );
+	TiXmlText * text = new TiXmlText( "World" );
+	element->LinkEndChild( text );
+	doc.LinkEndChild( decl );
+	doc.LinkEndChild( element );*/
+	doc.SaveFile( "madeByHand.xml" );
+}
+
 void tMachine::SetAlphabet(char *str)
 {
 
@@ -351,6 +377,8 @@ int _tmain(int argc, _TCHAR* argv[])
  //currRibbon = "*1111x11=*";
  t1.SetRibbon("*1111x111=*");
  t1.Solve();
+
+ SaveXML();
  
  system("PAUSE");
 
