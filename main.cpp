@@ -50,6 +50,8 @@ public:
 	void SetAlphabet(char *str);
 	void SetAlphabetFromXML(char *str);
 	void SetRibbon(char *str);
+	char *GetRibbonFromXML(char *filename);
+	void WriteRibbonToXML(char *filename);
 	void SetRules();
 	void SetXMLRules(char *str);
 	void Solve();
@@ -67,6 +69,43 @@ private:
 	Ribbon tmRibbon; //ќбъ€вл€ем переменную, тип которой есть список
 
 };
+
+char * tMachine::GetRibbonFromXML(char *filename)
+{
+	TiXmlDocument doc( filename );
+	bool loadOkay = doc.LoadFile();
+	if ( !loadOkay )
+	{
+		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		system("PAUSE");
+		exit( 1 );
+	}
+	TiXmlNode* node = 0;
+	TiXmlNode* node1 = 0;
+	TiXmlElement* RibbonElement = 0;
+	TiXmlElement* itemElement = 0;
+
+	node = doc.FirstChild( "Ribbon" );
+	assert( node );
+	RibbonElement = node->ToElement();
+	assert( RibbonElement  );
+	node = RibbonElement->FirstChildElement("In");	
+	std::string ttt = node->ValueTStr().c_str();
+	assert( node );
+	node = node->FirstChild();
+	//itemElement = node->ToElement();
+	ttt = node->Value();
+	char *result = new char[ttt.length()+1];
+	strcpy(result,ttt.c_str());
+	return result;
+	//assert( itemElement  );
+
+}
+
+void tMachine::WriteRibbonToXML(char *filename)
+{
+
+}
 
 void tMachine::SetAlphabetFromXML(char *str)
 {
@@ -589,7 +628,13 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::getline(std::cin, currRibbon);
  //
  //currRibbon = "*1111x11=*";
- t1.SetRibbon("*1111x111=*");
+ 
+ char *tempStrRibbon = t1.GetRibbonFromXML("ribbon.xml");
+
+ t1.SetRibbon(t1.GetRibbonFromXML("ribbon.xml"));
+
+ //t1.SetRibbon("*1111x111=*");
+
  t1.Solve();
 
  //t1.SaveXML();
