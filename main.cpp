@@ -30,6 +30,7 @@ public:
 	void SetRibbon(char *str);
 	void SetRules();
 	void Solve();
+	void SaveXML();
 	tMachine() {maxalphabet=0;maxstates=0;};
 	~tMachine() {
 	for (int count = 0; count < (maxalphabet+1); count++)
@@ -64,7 +65,7 @@ void tMachine::SetAlphabetFromXML(char *str)
 	assert( node );
 	TuringMachineElement = node->ToElement();
 	assert( TuringMachineElement  );
-	node = TuringMachineElement->FirstChildElement("Alphabet");	// This skips the "PDA" comment.
+	node = TuringMachineElement->FirstChildElement("Alphabet");	
 	std::string ttt = node->ValueTStr().c_str();
 	assert( node );
 	itemElement = node->FirstChildElement();
@@ -81,47 +82,43 @@ void tMachine::SetAlphabetFromXML(char *str)
 			alphabet[i] = ttt.at(0);
 			count++;
 		}
-	//char * ttt=itemElement->Attribute();
-
-
-	//int i;
-	//std::string currStr;
-	//currStr = str;
 
  maxalphabet = count;
- 
 
-
- //for ( i = 0; i < maxalphabet; i++ )
-// {
-//	 alphabet[i] = currStr.at(i);
-// }
 }
 
 
-void SaveXML()
+void tMachine::SaveXML()
 {
+	int i;
 	TiXmlDocument doc;
-	TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-	doc.LinkEndChild( decl );
-	TiXmlElement * element = new TiXmlElement( "TuringMachine" );
-	TiXmlElement * element1 = new TiXmlElement( "Alphabet" );
-	TiXmlElement * element2 = new TiXmlElement( "Symbol" );
-	TiXmlText * text = new TiXmlText( "1" );
-	element2->LinkEndChild( text );
-	element1->LinkEndChild( element2 );
-	element->LinkEndChild( element1 );
+	TiXmlElement * xmlroot;
+	TiXmlElement * xmlAlphabet;
+	TiXmlElement * xmlSymbol;
+	char tempCStr[2];	
 
-	doc.LinkEndChild( element );
-// Make xml: <?xml ..><Hello>World</Hello>
-	/*TiXmlDocument doc;
-	TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-	TiXmlElement * element = new TiXmlElement( "Hello" );
-	TiXmlText * text = new TiXmlText( "World" );
-	element->LinkEndChild( text );
-	doc.LinkEndChild( decl );
-	doc.LinkEndChild( element );*/
+	doc.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );
+	/// Create root element
+	xmlroot = new TiXmlElement( "TuringMachine" );
+	doc.LinkEndChild( xmlroot );
+	/// Create first child element Alphabet
+	xmlAlphabet = new TiXmlElement( "Alphabet" );
+	xmlroot->LinkEndChild( xmlAlphabet );
+	
+	/// Create child nodes Symbol in Alphabet
+	for ( i = 0; i < maxalphabet; i++ )
+	{
+		xmlSymbol = new TiXmlElement( "Symbol" );		
+		tempCStr[0] = alphabet[i];
+		tempCStr[1] = 0;
+		xmlSymbol->LinkEndChild( new TiXmlText( tempCStr ) );
+		xmlAlphabet->LinkEndChild( xmlSymbol );
+	}
+
+
+	
 	doc.SaveFile( "madeByHand.xml" );
+
 }
 
 void tMachine::SetAlphabet(char *str)
@@ -378,7 +375,7 @@ int _tmain(int argc, _TCHAR* argv[])
  t1.SetRibbon("*1111x111=*");
  t1.Solve();
 
- SaveXML();
+ t1.SaveXML();
  
  system("PAUSE");
 
