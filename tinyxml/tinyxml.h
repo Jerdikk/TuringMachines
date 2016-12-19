@@ -32,7 +32,6 @@ distribution.
 #pragma warning( disable : 4786 )
 #endif
 
-//#include "stdafx.h"
 
 #include <ctype.h>
 #include <stdio.h>

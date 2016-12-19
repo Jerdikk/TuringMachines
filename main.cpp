@@ -51,6 +51,7 @@ public:
 	void SetAlphabetFromXML(char *str);
 	void SetRibbon(char *str);
 	void SetRules();
+	void SetXMLRules(char *str);
 	void Solve();
 	void SaveXML();
 	tMachine() {maxalphabet=0;maxstates=0;};
@@ -69,12 +70,13 @@ private:
 
 void tMachine::SetAlphabetFromXML(char *str)
 {
-	//TiXmlDocument doc( "turing1.xml" );
+	
 	TiXmlDocument doc( str );
 	bool loadOkay = doc.LoadFile();
 	if ( !loadOkay )
 	{
 		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		system("PAUSE");
 		exit( 1 );
 	}
 
@@ -112,13 +114,14 @@ void tMachine::SetAlphabetFromXML(char *str)
 
 void tMachine::SaveXML()
 {
-	int i;
+	int i,j;
 	TiXmlDocument doc;
 	TiXmlElement * xmlroot;
 	TiXmlElement * xmlAlphabet;	
 	TiXmlElement * xmlSymbol;
 	TiXmlElement * xmlRules;
 	TiXmlElement * xmlRule;
+	//TiXmlElement * xmlElem;
 	char tempCStr[2];	
 
 	doc.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );
@@ -140,17 +143,55 @@ void tMachine::SaveXML()
 	}
 
 	xmlRules = new TiXmlElement( "Rules" );
+	xmlRules->SetAttribute("MaxStates", maxstates);
 	xmlroot->LinkEndChild( xmlRules );
 	
-	//CurentSymbol
-	//CurrentState
-	//SymbolToWrite
-	//NextState
-	//Direction
-	//IsRule
+	for ( i = 0; i < (maxstates+1); i++)
+		for ( j = 0; j < (maxalphabet+1); j++ )
+			if (currRules[j][i].isRule)
+			{
+				xmlRule = new TiXmlElement( "Rule" );
+				xmlRules->LinkEndChild( xmlRule );
+
+				//xmlElem = new TiXmlElement( "CurentSymbol" );
+				tempCStr[0] = alphabet[j];
+				tempCStr[1] = 0;
+				//xmlElem->LinkEndChild( new TiXmlText( tempCStr ) );
+				xmlRule->SetAttribute("CurentSymbol", tempCStr);
+				xmlRule->SetAttribute("CurrentState", i);
+				tempCStr[0] = currRules[j][i].currSymbol;
+				tempCStr[1] = 0;			
+				xmlRule->SetAttribute("SymbolToWrite", tempCStr);
+				xmlRule->SetAttribute("NextState", currRules[j][i].nextstate);
+				xmlRule->SetAttribute("IsRule", currRules[j][i].isRule);
+
+				switch (currRules[j][i].currDirection)
+				{
+				case TuringDirection::Left:
+					tempCStr[0] = 'L';
+					break;
+				case TuringDirection::Right:
+					tempCStr[0] = 'R';
+					break;
+				case TuringDirection::Stay:
+					tempCStr[0] = 'N';
+					break;
+				default:
+					tempCStr[0] = 0;
+					break;
+				}
+
+				xmlRule->SetAttribute("Direction", tempCStr);
+				//CurentSymbol
+				//CurrentState
+				//SymbolToWrite
+				//NextState
+				//Direction
+				//IsRule
+			}
 
 
-	doc.SaveFile( "madeByHand.xml" );
+	doc.SaveFile( "turing1.xml" );
 
 }
 
@@ -182,15 +223,155 @@ void tMachine::SetRibbon(char *str)
 	tmRibbon.Show(); //Отображаем список на экране
 
 }
+void tMachine::SetXMLRules(char *str)
+{
+	int count=0;
+	char tempChar;
+	int i,j, iCurrState,iNextState,iRes,iIsRule,currAlphabetNum;
+	maxstates = 9;
+
+	currRules = new Rules*[(maxalphabet+1)];
+
+
+	TiXmlDocument doc( str );
+	bool loadOkay = doc.LoadFile();
+	if ( !loadOkay )
+	{
+		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		system("PAUSE");
+		exit( 1 );
+	}
+
+	TiXmlNode* node = 0;
+	TiXmlNode* root = 0;
+	TiXmlNode* node1 = 0;
+	TiXmlElement* TuringMachineElement = 0;
+	TiXmlElement* itemElement = 0;
+
+	root = doc.FirstChild( "TuringMachine" );
+	assert( root );
+	TuringMachineElement = root->ToElement();
+	assert( TuringMachineElement  );
+	node = TuringMachineElement->FirstChildElement("Rules");	
+	itemElement = node->ToElement();
+	iRes = itemElement->QueryIntAttribute("MaxStates",&maxstates);			
+	if ( iRes == TIXML_NO_ATTRIBUTE )
+	{
+		printf( "Could not get maxtstates from XML. Exiting.\n");
+		system("PAUSE");
+		exit( 1 );
+	}
+
+	std::string ttt = node->ValueTStr().c_str();
+	assert( node );
+
+	for (i=0; i<(maxalphabet+1); i++)
+		currRules[i] = new Rules[(maxstates+1)];
+	/// Init rules
+	for (i=0; i<(maxstates+1); i++)
+		for (j=0; j<(maxalphabet+1); j++)
+		{
+			currRules[j][i].currDirection = TuringDirection::Stay;
+			currRules[j][i].currSymbol = 0;
+			currRules[j][i].isRule = 0;
+			currRules[j][i].nextstate = -1;
+		}
+
+
+	itemElement = node->FirstChildElement("Rule");
+	ttt = itemElement->Value();
+	assert( itemElement  );
+	
+	for( node1 = node->FirstChild( "Rule" ),i=0;
+			 node1;
+			 node1 = node1->NextSibling( "Rule" ),i++ )
+		{
+			ttt = node1->Value();
+			itemElement = node1->ToElement();
+			iRes = itemElement->QueryIntAttribute("NextState",&iNextState);
+			if ( iRes == TIXML_NO_ATTRIBUTE )
+			{
+				printf( "Could not get NextState from XML. Exiting.\n");
+				system("PAUSE");
+				exit( 1 );
+			}
+
+			if (iNextState>=0)
+			{
+				iRes = itemElement->QueryIntAttribute("CurrentState",&iCurrState);			
+				if ( iRes == TIXML_NO_ATTRIBUTE )
+				{
+					printf( "Could not get CurrentState from XML. Exiting.\n");
+					system("PAUSE");
+					exit( 1 );
+				}
+
+				iRes = itemElement->QueryIntAttribute("IsRule",&iIsRule);	
+				if ( iRes == TIXML_NO_ATTRIBUTE )
+				{
+					printf( "Could not get IsRule from XML. Exiting.\n");
+					system("PAUSE");
+					exit( 1 );
+				}
+
+				ttt = itemElement->Attribute("CurentSymbol");
+				tempChar = ttt.at(0);
+				currAlphabetNum = -1;
+				for ( j = 0; j < maxalphabet; j++ )	  
+					if (tempChar == alphabet[j])
+					{
+						currAlphabetNum = j;
+						j = maxalphabet;
+					};
+				if ((currAlphabetNum == -1) && (j == maxalphabet) && (iIsRule))
+				{
+					currAlphabetNum = j;
+				}
+				ttt = itemElement->Attribute("SymbolToWrite");
+				tempChar = ttt.at(0);
+				currRules[currAlphabetNum][iCurrState].currSymbol = tempChar;
+				ttt = itemElement->Attribute("Direction");
+				tempChar = ttt.at(0);
+				switch(tempChar)
+				{
+				case 'L':
+					currRules[currAlphabetNum][iCurrState].currDirection = TuringDirection::Left;
+					break;
+				case 'R':
+					currRules[currAlphabetNum][iCurrState].currDirection = TuringDirection::Right;
+					break;
+				case 'N':
+					currRules[currAlphabetNum][iCurrState].currDirection = TuringDirection::Stay;
+					break;
+				default:
+					break;
+				};
+				currRules[currAlphabetNum][iCurrState].nextstate = iNextState;
+				currRules[currAlphabetNum][iCurrState].isRule = iIsRule;
+				//alphabet[i] = ttt.at(0);
+			}
+			count++;
+		}
+
+ //maxalphabet = count;
+
+}
 void tMachine::SetRules()
 {
-	int i;
+	int i,j;
 	maxstates = 9;
 
 	currRules = new Rules*[(maxalphabet+1)];
 	for (i=0; i<(maxalphabet+1); i++)
 		currRules[i] = new Rules[(maxstates+1)];
-
+	for (i=0; i<(maxstates+1); i++)
+		for (j=0; j<(maxalphabet+1); j++)
+		{
+			currRules[j][i].currDirection = TuringDirection::Stay;
+			currRules[j][i].currSymbol = 0;
+			currRules[j][i].isRule = 0;
+			currRules[j][i].nextstate = -1;
+		}
 currRules[0][0].nextstate = 0;
  currRules[0][0].currSymbol = '1';
  currRules[0][0].currDirection = TuringDirection::Right;
@@ -348,6 +529,7 @@ void tMachine::Solve()
 						  if (!tmRibbon.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
 						  {
 							std::cout  << " Errorr !!!!";
+							system("PAUSE");
 						  }
 					  }
 				  }
@@ -394,10 +576,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
  t1.SetAlphabetFromXML("turing1.xml");
  
+ 
 
  //// Set rules
  
- t1.SetRules(); 
+ //t1.SetRules(); 
+ t1.SetXMLRules("turing1.xml");
  ////
 
  // если хотим ввести ленту вручную
@@ -408,7 +592,7 @@ int _tmain(int argc, _TCHAR* argv[])
  t1.SetRibbon("*1111x111=*");
  t1.Solve();
 
- t1.SaveXML();
+ //t1.SaveXML();
  
  system("PAUSE");
 
