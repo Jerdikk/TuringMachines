@@ -104,7 +104,55 @@ char * tMachine::GetRibbonFromXML(char *filename)
 
 void tMachine::WriteRibbonToXML(char *filename)
 {
-
+	int i;
+	TiXmlDocument doc( filename );
+	bool loadOkay = doc.LoadFile();
+	bool isnewfile = false;
+	if ( !loadOkay )
+	{
+		isnewfile = true;
+		//printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		//system("PAUSE");
+		//exit( 1 );
+	}
+	TiXmlNode* node = 0;
+	TiXmlNode* node1 = 0;
+	TiXmlElement* RibbonElement = 0;
+	TiXmlElement* itemElement = 0;
+	TiXmlText* textik = 0;
+	if (!isnewfile)
+	{
+		node = doc.FirstChild( "Ribbon" );
+		assert( node );
+		RibbonElement = node->ToElement();
+		assert( RibbonElement  );
+		node = RibbonElement->FirstChildElement("Out");	
+		std::string ttt = node->ValueTStr().c_str();
+		assert( node );
+		node1 = node->FirstChild();
+		//itemElement = node->ToElement();
+		char tempRibbon[1000];
+		//itemElement = node->ToElement();
+		tmRibbon.Top();
+		for ( i = 0; i < tmRibbon.GetRibbonLength(); i++ )
+		{
+			tempRibbon[i]=tmRibbon.ReadCellFromHeadPosition()->GetCellValue();
+			tmRibbon.Right();
+		}
+		tempRibbon[tmRibbon.GetRibbonLength()]=0;
+		if (!node1)
+		{
+			textik = new TiXmlText( tempRibbon );
+			node->LinkEndChild( textik );
+		}
+		else
+		 node1->SetValue(tempRibbon);
+		
+	}
+	else
+	{
+	}
+	doc.SaveFile( filename );
 }
 
 void tMachine::SetAlphabetFromXML(char *str)
@@ -636,6 +684,8 @@ int _tmain(int argc, _TCHAR* argv[])
  //t1.SetRibbon("*1111x111=*");
 
  t1.Solve();
+
+ t1.WriteRibbonToXML("ribbon.xml");
 
  //t1.SaveXML();
  

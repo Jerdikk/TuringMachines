@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Ribbon>
-  <In>*1x11=*</In>
-  <Out></Out>
+    <In>*11x11=*</In>
+    <Out>*11x11=1111*</Out>
 </Ribbon>

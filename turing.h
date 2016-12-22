@@ -60,10 +60,12 @@ class Ribbon : TuringObject
 	{         /// класс ленты дл€ машины “ьюринга
    RibbonCell *First, *Last; //”казатели на адреса начала списка и его конца
    RibbonCell *CurrentPosition;  //”казатели текущей €чейки над который расположен считыватель
+   int ribbonLength;
  public:
-     Ribbon():First(NULL),Last(NULL),CurrentPosition(NULL){}; //»нициализируем адреса как пустые
+     Ribbon():First(NULL),Last(NULL),CurrentPosition(NULL){ribbonLength=0;}; //»нициализируем адреса как пустые
      ~Ribbon(); //ƒеструктор
      void Show(); //‘ункци€ отображени€ списка на экране
+	 int GetRibbonLength() {return ribbonLength;};
      void Add(RibbonSymbol x); //‘ункци€ добавлени€ элементов в список
 	 int Left();
 	 int Right();
