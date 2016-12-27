@@ -33,6 +33,7 @@ distribution.
 
 const int MAXALPHABET = 128;
 const int MAXSTATES = 255;
+const int MAXRIBBON = 4096;
 
 int TuringObject::gTuringObjectNum=0;
 
@@ -47,9 +48,9 @@ struct Rules {
 class tMachine
 {
 public:
-	void SetAlphabet(char *str);
-	void SetAlphabetFromXML(char *str);
-	void SetRibbon(char *str);
+	bool SetAlphabet(char *str);
+	bool SetAlphabetFromXML(char *str);
+	bool SetRibbon(char *str);
 	char *GetRibbonFromXML(char *filename);
 	void WriteRibbonToXML(char *filename);
 	void SetRules();
@@ -62,6 +63,8 @@ public:
         delete [] currRules[count];
 	};
 private:
+	int positionOnRibbon;
+	int maxPositionOnRibbon;
 	int maxalphabet;
 	int maxstates;
 	char alphabet[MAXALPHABET];
@@ -70,36 +73,48 @@ private:
 
 };
 
+void OnErrorWrite(char *str)
+{
+	printf( "Suddenly App raise Error='%s'. Exiting.\n", str );
+	system("PAUSE");
+	exit( 1 );
+}
+
+
 char * tMachine::GetRibbonFromXML(char *filename)
 {
+	
 	TiXmlDocument doc( filename );
 	bool loadOkay = doc.LoadFile();
 	if ( !loadOkay )
-	{
-		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
-		system("PAUSE");
-		exit( 1 );
+	{		
+		char *errstr=new char[255];
+		sprintf( errstr,"Could not load test file '%s'. Error='%s'.", filename, doc.ErrorDesc() );
+		OnErrorWrite(errstr);
 	}
 	TiXmlNode* node = 0;
 	TiXmlNode* node1 = 0;
 	TiXmlElement* RibbonElement = 0;
 	TiXmlElement* itemElement = 0;
 
-	node = doc.FirstChild( "Ribbon" );
-	assert( node );
+	node = doc.FirstChild("Ribbon");
+	assert(node);
 	RibbonElement = node->ToElement();
 	assert( RibbonElement  );
 	node = RibbonElement->FirstChildElement("In");	
 	std::string ttt = node->ValueTStr().c_str();
 	assert( node );
 	node = node->FirstChild();
-	//itemElement = node->ToElement();
 	ttt = node->Value();
-	char *result = new char[ttt.length()+1];
+	if (ttt.empty()) OnErrorWrite("String with Ribbon in XML is empty!");
+	
+	maxPositionOnRibbon = ttt.length();
+	if (maxPositionOnRibbon>=MAXRIBBON) OnErrorWrite("String with Ribbon is too long!");
+	positionOnRibbon=0;
+	char *result = new char[maxPositionOnRibbon+1];
 	strcpy(result,ttt.c_str());
-	return result;
-	//assert( itemElement  );
 
+	return result;
 }
 
 void tMachine::WriteRibbonToXML(char *filename)
@@ -108,13 +123,7 @@ void tMachine::WriteRibbonToXML(char *filename)
 	TiXmlDocument doc( filename );
 	bool loadOkay = doc.LoadFile();
 	bool isnewfile = false;
-	if ( !loadOkay )
-	{
-		isnewfile = true;
-		//printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
-		//system("PAUSE");
-		//exit( 1 );
-	}
+	if ( !loadOkay ) isnewfile = true;	
 	TiXmlNode* node = 0;
 	TiXmlNode* node1 = 0;
 	TiXmlElement* RibbonElement = 0;
@@ -129,10 +138,9 @@ void tMachine::WriteRibbonToXML(char *filename)
 		node = RibbonElement->FirstChildElement("Out");	
 		std::string ttt = node->ValueTStr().c_str();
 		assert( node );
-		node1 = node->FirstChild();
-		//itemElement = node->ToElement();
-		char tempRibbon[1000];
-		//itemElement = node->ToElement();
+		node1 = node->FirstChild();		
+		if (tmRibbon.GetRibbonLength()>=MAXRIBBON) OnErrorWrite("String with Ribbon is too long to write!");
+		char tempRibbon[MAXRIBBON];		
 		tmRibbon.Top();
 		for ( i = 0; i < tmRibbon.GetRibbonLength(); i++ )
 		{
@@ -155,16 +163,16 @@ void tMachine::WriteRibbonToXML(char *filename)
 	doc.SaveFile( filename );
 }
 
-void tMachine::SetAlphabetFromXML(char *str)
+bool tMachine::SetAlphabetFromXML(char *str)
 {
-	
+
+	if (str==0)	return false;
 	TiXmlDocument doc( str );
 	bool loadOkay = doc.LoadFile();
 	if ( !loadOkay )
 	{
 		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
-		system("PAUSE");
-		exit( 1 );
+		return false;
 	}
 
 	TiXmlNode* node = 0;
@@ -194,7 +202,8 @@ void tMachine::SetAlphabetFromXML(char *str)
 			count++;
 		}
 
- maxalphabet = count;
+	maxalphabet = count;
+	return true;
 
 }
 
@@ -282,33 +291,33 @@ void tMachine::SaveXML()
 
 }
 
-void tMachine::SetAlphabet(char *str)
+bool tMachine::SetAlphabet(char *str)
 {
-
 	int i;
 	std::string currStr;
+	if (str==0) return false;
 	currStr = str;
-
- maxalphabet = currStr.length();
- 
-
-
- for ( i = 0; i < maxalphabet; i++ )
- {
-	 alphabet[i] = currStr.at(i);
- }
+	maxalphabet = currStr.length();
+	for ( i = 0; i < maxalphabet; i++ )
+	{
+		alphabet[i] = currStr.at(i);
+	}
+	return true;	
 }
 
-void tMachine::SetRibbon(char *str)
+bool tMachine::SetRibbon(char *str)
 {
 	int i;
 	std::string currRibbon;
+	if (str==0) return false;
 	currRibbon = str;
-	int ribbonlength = currRibbon.length();
-	for ( i = 0; i < ribbonlength; i++ )
+	maxPositionOnRibbon = currRibbon.length();
+	if (maxPositionOnRibbon>=MAXRIBBON) return false;
+	positionOnRibbon=0;
+	for ( i = 0; i < maxPositionOnRibbon; i++ )
 		tmRibbon.Add(currRibbon.at(i)); //Добавляем в список элементы
 	tmRibbon.Show(); //Отображаем список на экране
-
+	return true;		
 }
 void tMachine::SetXMLRules(char *str)
 {
@@ -661,9 +670,8 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::getline(std::cin, currStr);
  //
 
- t1.SetAlphabetFromXML("turing1.xml");
- 
- 
+ if (!t1.SetAlphabetFromXML("turing1.xml"))
+	 OnErrorWrite("Can't set alphabet from XML!"); 
 
  //// Set rules
  
@@ -679,16 +687,16 @@ int _tmain(int argc, _TCHAR* argv[])
  
  char *tempStrRibbon = t1.GetRibbonFromXML("ribbon.xml");
 
- t1.SetRibbon(t1.GetRibbonFromXML("ribbon.xml"));
-
+ if (tempStrRibbon==0) 
+	 OnErrorWrite("Can't read ribbon from XML!");
+ if (!t1.SetRibbon(t1.GetRibbonFromXML("ribbon.xml")))
+	 OnErrorWrite("Can't read and set ribbon from XML!");
  //t1.SetRibbon("*1111x111=*");
-
  t1.Solve();
-
  t1.WriteRibbonToXML("ribbon.xml");
-
  //t1.SaveXML();
  
+
  system("PAUSE");
 
 	return 0;
