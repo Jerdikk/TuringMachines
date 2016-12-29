@@ -54,7 +54,7 @@ public:
 	char *GetRibbonFromXML(char *filename);
 	void WriteRibbonToXML(char *filename);
 	void SetRules();
-	void SetXMLRules(char *str);
+	bool SetXMLRules(char *str);
 	void Solve();
 	void SaveXML();
 	tMachine() {maxalphabet=0;maxstates=0;};
@@ -171,7 +171,7 @@ bool tMachine::SetAlphabetFromXML(char *str)
 	bool loadOkay = doc.LoadFile();
 	if ( !loadOkay )
 	{
-		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		printf( "Could not load test file '%s'. Error='%s'. Exiting.\n", str, doc.ErrorDesc() );
 		return false;
 	}
 
@@ -319,7 +319,7 @@ bool tMachine::SetRibbon(char *str)
 	tmRibbon.Show(); //Отображаем список на экране
 	return true;		
 }
-void tMachine::SetXMLRules(char *str)
+bool tMachine::SetXMLRules(char *str)
 {
 	int count=0;
 	char tempChar;
@@ -333,9 +333,8 @@ void tMachine::SetXMLRules(char *str)
 	bool loadOkay = doc.LoadFile();
 	if ( !loadOkay )
 	{
-		printf( "Could not load test file 'turing1.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
-		system("PAUSE");
-		exit( 1 );
+		printf( "Could not load test file '%s'. Error='%s'.\n", str, doc.ErrorDesc() );
+		return false;
 	}
 
 	TiXmlNode* node = 0;
@@ -353,9 +352,8 @@ void tMachine::SetXMLRules(char *str)
 	iRes = itemElement->QueryIntAttribute("MaxStates",&maxstates);			
 	if ( iRes == TIXML_NO_ATTRIBUTE )
 	{
-		printf( "Could not get maxtstates from XML. Exiting.\n");
-		system("PAUSE");
-		exit( 1 );
+		printf( "Could not get maxtstates from XML.\n");
+		return false;	
 	}
 
 	std::string ttt = node->ValueTStr().c_str();
@@ -387,9 +385,8 @@ void tMachine::SetXMLRules(char *str)
 			iRes = itemElement->QueryIntAttribute("NextState",&iNextState);
 			if ( iRes == TIXML_NO_ATTRIBUTE )
 			{
-				printf( "Could not get NextState from XML. Exiting.\n");
-				system("PAUSE");
-				exit( 1 );
+				printf( "Could not get NextState from XML.\n");
+				return false;			
 			}
 
 			if (iNextState>=0)
@@ -398,16 +395,14 @@ void tMachine::SetXMLRules(char *str)
 				if ( iRes == TIXML_NO_ATTRIBUTE )
 				{
 					printf( "Could not get CurrentState from XML. Exiting.\n");
-					system("PAUSE");
-					exit( 1 );
+					return false;			
 				}
 
 				iRes = itemElement->QueryIntAttribute("IsRule",&iIsRule);	
 				if ( iRes == TIXML_NO_ATTRIBUTE )
 				{
 					printf( "Could not get IsRule from XML. Exiting.\n");
-					system("PAUSE");
-					exit( 1 );
+					return false;			
 				}
 
 				ttt = itemElement->Attribute("CurentSymbol");
@@ -449,6 +444,7 @@ void tMachine::SetXMLRules(char *str)
 			count++;
 		}
 
+	return true;
  //maxalphabet = count;
 
 }
@@ -676,7 +672,8 @@ int _tmain(int argc, _TCHAR* argv[])
  //// Set rules
  
  //t1.SetRules(); 
- t1.SetXMLRules("turing1.xml");
+ if(!t1.SetXMLRules("turing1.xml"))
+	 OnErrorWrite("Can't set rules for TMachine from XML!"); 
  ////
 
  // если хотим ввести ленту вручную
