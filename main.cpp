@@ -617,7 +617,7 @@ void tMachine::Solve()
 				  {
 					  if (currRules[currAlphabetNum][currentTuringMachineState].currDirection == TuringDirection::Right)
 					  {
-						  tmRibbon.Add(' ');
+						  tmRibbon.Add('_');
 						  if (!tmRibbon.Move(currRules[currAlphabetNum][currentTuringMachineState].currDirection))
 						  {
 							std::cout  << " Errorr !!!!";
@@ -666,13 +666,13 @@ int _tmain(int argc, _TCHAR* argv[])
  //std::getline(std::cin, currStr);
  //
 
- if (!t1.SetAlphabetFromXML("turing1.xml"))
+ if (!t1.SetAlphabetFromXML("turing2.xml"))
 	 OnErrorWrite("Can't set alphabet from XML!"); 
 
  //// Set rules
  
  //t1.SetRules(); 
- if(!t1.SetXMLRules("turing1.xml"))
+ if(!t1.SetXMLRules("turing2.xml"))
 	 OnErrorWrite("Can't set rules for TMachine from XML!"); 
  ////
 
@@ -682,15 +682,15 @@ int _tmain(int argc, _TCHAR* argv[])
  //
  //currRibbon = "*1111x11=*";
  
- char *tempStrRibbon = t1.GetRibbonFromXML("ribbon.xml");
+ char *tempStrRibbon = t1.GetRibbonFromXML("ribbon1.xml");
 
  if (tempStrRibbon==0) 
 	 OnErrorWrite("Can't read ribbon from XML!");
- if (!t1.SetRibbon(t1.GetRibbonFromXML("ribbon.xml")))
+ if (!t1.SetRibbon(t1.GetRibbonFromXML("ribbon1.xml")))
 	 OnErrorWrite("Can't read and set ribbon from XML!");
  //t1.SetRibbon("*1111x111=*");
  t1.Solve();
- t1.WriteRibbonToXML("ribbon.xml");
+ t1.WriteRibbonToXML("ribbon1.xml");
  //t1.SaveXML();
  
 

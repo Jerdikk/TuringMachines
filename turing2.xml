@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<TuringMachine>
+    <Alphabet>
+        <Symbol>1</Symbol>
+		<Symbol>2</Symbol>
+		<Symbol>3</Symbol>
+		<Symbol>4</Symbol>
+		<Symbol>5</Symbol>
+		<Symbol>6</Symbol>
+		<Symbol>7</Symbol>
+		<Symbol>8</Symbol>
+        <Symbol>*</Symbol>
+        <Symbol>9</Symbol>
+        <Symbol>0</Symbol>        
+		<Symbol>_</Symbol>
+    </Alphabet>
+    <Rules MaxStates="4">
+		<Rule CurentSymbol="*" CurrentState="0" SymbolToWrite="*" NextState="0" IsRule="1" Direction="R" />
+        <Rule CurentSymbol="0" CurrentState="0" SymbolToWrite="0" NextState="0" IsRule="1" Direction="L" />
+		<Rule CurentSymbol="1" CurrentState="0" SymbolToWrite="1" NextState="0" IsRule="1" Direction="L" />
+		<Rule CurentSymbol="2" CurrentState="0" SymbolToWrite="1" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="3" CurrentState="0" SymbolToWrite="2" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="4" CurrentState="0" SymbolToWrite="3" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="5" CurrentState="0" SymbolToWrite="4" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="6" CurrentState="0" SymbolToWrite="5" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="7" CurrentState="0" SymbolToWrite="6" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="8" CurrentState="0" SymbolToWrite="7" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="9" CurrentState="0" SymbolToWrite="8" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="1" CurrentState="1" SymbolToWrite="1" NextState="1" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="*" CurrentState="1" SymbolToWrite="1" NextState="2" IsRule="1" Direction="R" />
+		<Rule CurentSymbol="_" CurrentState="2" SymbolToWrite="*" NextState="3" IsRule="1" Direction="L" />
+		<Rule CurentSymbol="1" CurrentState="3" SymbolToWrite="1" NextState="3" IsRule="1" Direction="L" />
+		<Rule CurentSymbol="2" CurrentState="3" SymbolToWrite="2" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="3" CurrentState="3" SymbolToWrite="3" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="4" CurrentState="3" SymbolToWrite="4" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="5" CurrentState="3" SymbolToWrite="5" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="6" CurrentState="3" SymbolToWrite="6" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="7" CurrentState="3" SymbolToWrite="7" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="8" CurrentState="3" SymbolToWrite="8" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="9" CurrentState="3" SymbolToWrite="9" NextState="0" IsRule="1" Direction="N" />
+		<Rule CurentSymbol="*" CurrentState="3" SymbolToWrite="*" NextState="4" IsRule="1" Direction="N" />		
+    </Rules>
+</TuringMachine>
