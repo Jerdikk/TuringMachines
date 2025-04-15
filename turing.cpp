@@ -66,7 +66,7 @@ Ribbon::~Ribbon() //Деструктор
       //Временный указатель на адрес последнего элемента
      while (temp!=NULL) //Пока не встретится пустое значение
      {
-		 std::cout<<temp->GetCharCellValue()<<" "; //Выводить значение на экран
+		 std::cout<<temp->GetCellsCharValue()<<" "; //Выводить значение на экран
 	 temp=temp->Prev; //Указываем, что нужен адрес предыдущего элемента
      }
      std::cout<<"\n";
@@ -77,7 +77,7 @@ Ribbon::~Ribbon() //Деструктор
 	RibbonCell *temp=ReadCellFromHeadPosition();
     while (temp!=NULL) //Пока не встретим пустое значение
      {
-	 std::cout<<temp->GetCharCellValue()<<" "; //Выводим каждое считанное значение на экран
+	 std::cout<<temp->GetCellsCharValue()<<" "; //Выводим каждое считанное значение на экран
 	 temp=temp->Next; //Смена адреса на адрес следующего элемента
      }
      std::cout<<"\n";

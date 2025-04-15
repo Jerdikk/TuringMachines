@@ -50,7 +50,7 @@ class RibbonCell : TuringObject   /// структура €чейки ленты
 	public:
 		RibbonCell() {Next=NULL;Prev=NULL;};
 		RibbonSymbol GetCellValue() {return CellValue;};
-		char GetCharCellValue() {return char(CellValue);};
+		char GetCellsCharValue() {return char(CellValue);};
 		void SetCellValue(RibbonSymbol x) {CellValue = x;};		
 
 		RibbonCell *Next, *Prev;
